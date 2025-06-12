@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Тест по налогам</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(120deg, #dbeafe, #fee2e2);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      margin: 0;
+      padding: 20px;
+    }
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #1e3a8a;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .question h3 {
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      background: #f3f4f6;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    label:hover {
+      background: #e5e7eb;
+    }
+    label.correct {
+      background-color: #d1fae5;
+      border-left: 5px solid #10b981;
+    }
+    label.incorrect {
+      background-color: #fee2e2;
+      border-left: 5px solid #ef4444;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #3b82f6;
+      color: white;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background-color: #2563eb;
+    }
+    .result {
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Тест по налогам</h1>
+  <form id="quizForm"></form>
+  <div style="text-align:center;">
+    <button type="button" onclick="submitQuiz()">Проверить</button>
+    <button type="button" onclick="resetQuiz()">Начать заново</button>
+  </div>
+  <div id="result" class="result"></div>
+</div>
+<div class="footer">mustafo</div>
+<script>
+  const questions = []; // Вставлю ниже
+
+  let userAnswers = new Array(questions.length).fill(null);
+
+  function renderQuiz() {
+    const quizForm = document.getElementById("quizForm");
+    quizForm.innerHTML = "";
+    questions.forEach((q, idx) => {
+      const shuffled = q.options.map((opt, i) => { return { text: opt, index: i }; });
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      questions[idx].shuffled = shuffled;
+
+      const block = document.createElement("div");
+      block.classList.add("question");
+      const title = document.createElement("h3");
+      title.innerText = (idx + 1) + ". " + q.q;
+      block.appendChild(title);
+
+      shuffled.forEach((opt, i) => {
+        const label = document.createElement("label");
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "q" + idx;
+        input.value = opt.index;
+        input.onclick = () => {
+          userAnswers[idx] = parseInt(input.value);
+        };
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(" " + opt.text));
+        block.appendChild(label);
+      });
+
+      quizForm.appendChild(block);
+    });
+  }
+
+  function submitQuiz() {
+    let correct = 0;
+    questions.forEach((q, idx) => {
+      const correctIndex = q.answer;
+      const selected = userAnswers[idx];
+      const inputs = document.getElementsByName("q" + idx);
+      inputs.forEach((input) => {
+        const parent = input.parentElement;
+        parent.classList.remove("correct", "incorrect");
+        const originalIndex = parseInt(input.value);
+        if (originalIndex === correctIndex) {
+          parent.classList.add("correct");
+        } else if (selected === originalIndex) {
+          parent.classList.add("incorrect");
+        }
+      });
+      if (selected === correctIndex) correct++;
+    });
+    document.getElementById("result").innerText =
+      "Вы ответили правильно на " + correct + " из " + questions.length +
+      " вопросов (" + Math.round(correct / questions.length * 100) + "%)";
+  }
+
+  function resetQuiz() {
+    userAnswers = new Array(questions.length).fill(null);
+    renderQuiz();
+    document.getElementById("result").innerText = "";
+  }
+
+  renderQuiz();
+</script>
+</body>
+</html>
