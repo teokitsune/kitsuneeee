@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>kitsuneeee</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <h1>Тест налогообложение</h1>
+  <div id="quizContainer"></div>
+  <button onclick="submitQuiz()">Проверить</button>
+  <div id="result"></div>
+
+  <!-- Подключаем JS-файл с вопросами -->
+  <script src="questions_full.js"></script>
+  <script>
+    const quizContainer = document.getElementById('quizContainer');
+    const resultContainer = document.getElementById('result');
+
+    questions.forEach((q, index) => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `<p>${index + 1}) ${q.q}</p>` + 
+        q.options.map((opt, i) => `
+          <label><input type="radio" name="q${index}" value="${i}"> ${opt}</label>
+        `).join('<br>');
+      quizContainer.appendChild(wrapper);
+    });
+
+    function submitQuiz() {
+      let correct = 0;
+      questions.forEach((q, i) => {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selected && parseInt(selected.value) === q.answer) {
+          correct++;
+        }
+      });
+      resultContainer.innerHTML = `Правильных ответов: ${correct} из ${questions.length} (${Math.round((correct / questions.length) * 100)}%)`;
+    }
+  </script>
+</body>
+</html>
